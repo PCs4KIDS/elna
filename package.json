@@ -1,0 +1,23 @@
+{
+  "name": "gas",
+  "version": "1.0.0",
+  "description": "A game",
+  "main": "js/game.js",
+  "author": "Samuel Imolorhe",
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "raw-loader": "^0.5.1",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15",
+    "webpack-dev-server": "^3.1.3"
+  },
+  "dependencies": {
+    "phaser": "^3.6.0"
+  }
+}
