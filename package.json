@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack-dev-server",
-    "build": "webpack"
+    "build": "webpack",
+    "heroku-postbuild": "yarn build"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
