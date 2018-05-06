@@ -1,6 +1,7 @@
 import { gameScene } from './scenes';
 import { MainScene } from './scenes/main';
 import { PreloadScene } from './scenes/preload';
+import { StartScene } from './scenes/start';
 
 export const config = {
     type: Phaser.AUTO, // Let phaser determine how to render the game
@@ -16,5 +17,5 @@ export const config = {
             debug: true
         }
     },
-    scene: [ PreloadScene, MainScene ]
+    scene: [ PreloadScene, StartScene, MainScene ]
 };

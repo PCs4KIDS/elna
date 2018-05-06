@@ -19,14 +19,14 @@ export default class {
         ).setInteractive(this.bubbleShape, Phaser.Geom.Circle.Contains);
         this.bubble = scene.add.sprite(this.opts.bubbleSize / 2, this.opts.bubbleSize / 2, 'bubble');
         this.bubble.setDisplaySize(this.opts.bubbleSize, this.opts.bubbleSize);
-
-        // this.physics.world.enable([this.container]);
+        this.bubble.setOrigin(0.5);
 
         // Using + operator
         const num1 = Phaser.Math.Between(0, this.opts.value);
         const num2 = this.opts.value - num1;
 
         this.bubbleText = scene.add.bitmapText(0, 0, 'yellowFont', `${num1} + ${num2}`, 50);
+        this.bubbleText.setOrigin(0.5);
 
         Phaser.Display.Align.In.Center(this.bubbleText, this.bubble);
         this.container.add([this.bubble, this.bubbleText]);
