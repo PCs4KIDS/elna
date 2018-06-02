@@ -35,6 +35,7 @@ export class StartScene extends Phaser.Scene {
 
     initEvents() {
         this.playButton.on('pointerdown', () => {
+            this.soundtrack.stop();
             this.scene.start('main');
         });
     }
