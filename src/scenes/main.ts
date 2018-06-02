@@ -1,21 +1,32 @@
 import Phaser from 'phaser';
 import Bubble from '../objects/bubble';
+import { OPERATIONS } from '../operations';
 
 export class MainScene extends Phaser.Scene {
+    bubbleCount = 2;
+    level = 1;
+    bubbles: Array<any> = [];
+    maxRespawnTries = 3;
+    lives = 3;
+    score = 0;
+
+    mode = OPERATIONS.NONE;
+
+    bg;
+    soundtrack;
+    scoreCard;
+    livesLeft;
+
     constructor() {
         super({ key: 'main' });
-        this.bubbleCount = 2;
-        this.level = 1;
-        this.bubbles = [];
-        this.maxRespawnTries = 3;
-        this.lives = 3;
-        this.score = 0;
     }
 
     preload() {}
 
-    create() {
-        this.bg = this.add.tileSprite(0, 0, this.sys.game.config.width, this.sys.game.config.height, 'bg');
+    create(data) {
+        this.mode = data.mode;
+
+        this.bg = this.add.tileSprite(0, 0, +this.sys.game.config.width, +this.sys.game.config.height, 'bg');
         this.bg.setOrigin(0, 0);
 
         this.soundtrack = this.sound.add('puzzle', { loop: true, volume: .1 });
@@ -44,28 +55,35 @@ export class MainScene extends Phaser.Scene {
     }
 
     startLevel() {
+        // Clean out all bubble objects
         this.bubbles.forEach(bubble => {
             if (bubble) {
-                bubble.object.container.destroy()
+                bubble.object.destroy()
             }
         });
+
+        // Calculate the number of bubbles
         const bubbleCount = Math.floor(this.bubbleCount + (this.level * 0.1));
+
         this.bubbles = [];
 
         for (let i = 0; i < bubbleCount; i++) {
             let remainingTries = this.maxRespawnTries;
-            let curBubble = null
+            let curBubble;
             do {
                 // If the current bubble was already created in a previous iteration, destroy it and create it again
                 if (curBubble) {
-                    curBubble.object.container.destroy();
+                    curBubble.object.destroy();
                 }
 
                 const value = Phaser.Math.Between(1 + (this.level * 10), 100 + (this.level * 15));
+
                 curBubble = {
                     object: new Bubble({
                         value,
-                        onClick: data => this.clickedBubble(data)
+                        onClick: data => this.clickedBubble(data),
+                        level: this.level,
+                        mode: this.mode
                     }, this),
                     value
                 };
@@ -87,6 +105,7 @@ export class MainScene extends Phaser.Scene {
                 console.log('intersect!', curBubble, bubble);
                 return true;
             }
+            return false;
         });
     }
 
@@ -103,17 +122,17 @@ export class MainScene extends Phaser.Scene {
             this.showLoss();
         }
 
-        this.time.delayedCall(500, function () {
+        this.time.delayedCall(500, () => {
             this.startLevel();
         }, [], this);
     }
 
     showWin() {
-        const winText = this.add.bitmapText(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'yellowFont', 'Score!!', 60);
+        const winText = this.add.bitmapText(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, 'yellowFont', 'Score!!', 60);
         winText.setOrigin(0.5);
         winText.setScale(0);
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
-        Phaser.Display.Align.In.Center(winText, this.add.zone(this.sys.game.config.width / 2, this.sys.game.config.height / 2, this.sys.game.config.width, this.sys.game.config.height));
+        Phaser.Display.Align.In.Center(winText, this.add.zone(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, +this.sys.game.config.width, +this.sys.game.config.height));
 
         this.tweens.add({
             targets: winText,
@@ -129,11 +148,11 @@ export class MainScene extends Phaser.Scene {
     }
 
     showLoss() {
-        const lossText = this.add.bitmapText(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'yellowFont', 'Wrong!', 60);
+        const lossText = this.add.bitmapText(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, 'yellowFont', 'Wrong!', 60);
         lossText.setOrigin(0.5);
         lossText.setScale(0);
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
-        Phaser.Display.Align.In.Center(lossText, this.add.zone(this.sys.game.config.width / 2, this.sys.game.config.height / 2, this.sys.game.config.width, this.sys.game.config.height));
+        Phaser.Display.Align.In.Center(lossText, this.add.zone(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, +this.sys.game.config.width, +this.sys.game.config.height));
 
         this.tweens.add({
             targets: lossText,
