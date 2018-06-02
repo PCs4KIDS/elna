@@ -122,9 +122,14 @@ export class MainScene extends Phaser.Scene {
             this.showLoss();
         }
 
-        this.time.delayedCall(500, () => {
-            this.startLevel();
-        }, [], this);
+        if (this.lives > 0) {
+            this.time.delayedCall(500, () => {
+                this.startLevel();
+            }, [], this);
+        } else {
+            // Game over.
+            this.gameOver();
+        }
     }
 
     showWin() {
@@ -163,6 +168,28 @@ export class MainScene extends Phaser.Scene {
             onComplete: () => lossText.destroy()
         });
         this.cameras.main.shake(300);
+    }
+
+    gameOver() {
+        const gameOverText = this.add.bitmapText(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, 'yellowFont', 'GAME OVER.', 70);
+        gameOverText.setOrigin(0.5);
+        gameOverText.setScale(0);
+        // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
+        Phaser.Display.Align.In.Center(gameOverText, this.add.zone(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, +this.sys.game.config.width, +this.sys.game.config.height));
+
+        this.tweens.add({
+            targets: gameOverText,
+            scaleX: 2,
+            scaleY: 2,
+            ease: 'Sine.easeIn',
+            duration: 500,
+            onComplete: () => this.cameras.main.fadeOut(1000)
+        });
+
+        this.time.delayedCall(2000, () => {
+            this.soundtrack.stop();
+            this.scene.start('start');
+        }, [], this);
     }
 
     updateScore(score) {
