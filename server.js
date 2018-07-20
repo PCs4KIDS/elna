@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-app.use(express.static(path.join(__dirname, '')));
+app.use(express.static('./'));
 
 const forceSSL = function () {
     return function (req, res, next) {
