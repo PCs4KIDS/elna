@@ -3,19 +3,42 @@ import Bubble from '../objects/bubble';
 import { OPERATIONS } from '../operations';
 
 export class MainScene extends Phaser.Scene {
+    initialState = {
+        level: 1,
+        lives: 3,
+        score: 0,
+        levelTime: 10000
+    };
     bubbleCount = 2;
-    level = 1;
     bubbles: Array<any> = [];
     maxRespawnTries = 3;
-    lives = 3;
-    score = 0;
+    liveHearts: Phaser.GameObjects.Sprite[] = [];
+    level = this.initialState.level;
+    lives = this.initialState.lives;
+    score = this.initialState.score;
+    levelTime = this.initialState.levelTime;
 
     mode = OPERATIONS.NONE;
 
+    progressBarOptions = {
+        outerPadding: 10,
+        height: 50
+    };
+
+    heartOptions = {
+        size: 30,
+        padding: 10
+    };
+
     bg;
     soundtrack;
+    bubblesSfx;
+    wrongSfx;
+    correctSfx;
     scoreCard;
-    livesLeft;
+    progressBar;
+
+    progressTimer;
 
     constructor() {
         super({ key: 'main' });
@@ -26,32 +49,53 @@ export class MainScene extends Phaser.Scene {
     create(data) {
         this.mode = data.mode;
 
-        this.bg = this.add.tileSprite(0, 0, +this.sys.game.config.width, +this.sys.game.config.height, 'bg');
+        this.bg = this.add.sprite(0, 0, 'bg');
         this.bg.setOrigin(0, 0);
+        this.bg.setDisplaySize(+this.sys.game.config.width, +this.sys.game.config.height);
 
-        this.soundtrack = this.sound.add('puzzle', { loop: true, volume: .1 });
-        
+        this.soundtrack = this.sound.add('bg_music', { loop: true });
+        this.bubblesSfx = this.sound.add('bubbles_rising_sfx', { loop: true, volume: .5 });
+        this.wrongSfx = this.sound.add('wrong_sfx', {});
+        this.correctSfx = this.sound.add('correct_sfx', {});
+
         this.soundtrack.play();
+        this.bubblesSfx.play();
 
         this.scoreCard = this.add.bitmapText(10, 10, 'yellowFont', `Score: ${this.score}`, 40);
+        this.add.text(10, 60, 'Tip: Bigger = Better.');
 
-        this.livesLeft = this.add.bitmapText(10, 60, 'yellowFont', `Lives Left: ${this.lives}`, 40);
+        // this.progressBar = this.add.sprite(this.progressBarOptions.outerPadding, +this.sys.game.config.height - this.progressBarOptions.height - this.progressBarOptions.outerPadding, 'progress_bar');
+        this.progressBar = this.add.tileSprite(this.progressBarOptions.outerPadding, +this.sys.game.config.height - this.progressBarOptions.height - this.progressBarOptions.outerPadding, 128, 128, 'progress_tile');
+        this.progressBar.setOrigin(0);
+        this.progressBar.setDisplaySize(0, this.progressBarOptions.height);
 
         // this.txtStartGame = this.add.bitmapText(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'yellowFont', 'Enla', 60);
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
         // Phaser.Display.Align.In.Center(this.txtStartGame, this.add.zone(this.sys.game.config.width / 2, this.sys.game.config.height / 2, this.sys.game.config.width, this.sys.game.config.height));
 
+        // Called before the game begins
+        // NOTE: Not before each level.
+        this.setInitialState();
+
+        this.updateLives(this.lives);
+
         this.startLevel();
-
-        // this.input.keyboard.on('keyup_D', e => console.log('Pressed D.'));
-
-        // this.key_A = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     }
 
     update() {
+        // console.log(this.progressTimer.getProgress());
+        const maxProgressWidth = +this.sys.game.config.width - (this.progressBarOptions.outerPadding * 2);
+        this.progressBar.displayWidth = maxProgressWidth * this.progressTimer.getProgress();
         // if (this.key_A.isDown) {
         //     console.log('A is down.');
         // }
+    }
+
+    setInitialState() {
+        this.level = this.initialState.level;
+        this.lives = this.initialState.lives;
+        this.score = this.initialState.score;
+        this.levelTime = this.initialState.levelTime;
     }
 
     startLevel() {
@@ -91,6 +135,10 @@ export class MainScene extends Phaser.Scene {
             } while(this.isBubbleInstersecting(curBubble) && remainingTries--);
             this.bubbles = [ ...this.bubbles, curBubble ];
         }
+
+        this.resetProgressTimer();
+        this.progressTimer = this.time.delayedCall(this.levelTime, this.checkValue, [], this);
+
         this.cameras.main.resetFX();
     }
 
@@ -110,8 +158,12 @@ export class MainScene extends Phaser.Scene {
     }
 
     clickedBubble(bubbleValue) {
+        this.checkValue(bubbleValue);
+    }
+
+    checkValue(val) {
         const bubbleMax = this.bubbles.reduce((acc, cur) => Math.max(acc, cur.value), 0);
-        if (bubbleValue >= bubbleMax) {
+        if (val && val >= bubbleMax) {
             console.log('Winner.');
             this.level++;
             this.updateScore(this.score + 10);
@@ -139,6 +191,7 @@ export class MainScene extends Phaser.Scene {
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
         Phaser.Display.Align.In.Center(winText, this.add.zone(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, +this.sys.game.config.width, +this.sys.game.config.height));
 
+        this.correctSfx.play();
         this.tweens.add({
             targets: winText,
             scaleX: 2,
@@ -159,6 +212,7 @@ export class MainScene extends Phaser.Scene {
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
         Phaser.Display.Align.In.Center(lossText, this.add.zone(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, +this.sys.game.config.width, +this.sys.game.config.height));
 
+        this.wrongSfx.play();
         this.tweens.add({
             targets: lossText,
             scaleX: 2,
@@ -186,10 +240,19 @@ export class MainScene extends Phaser.Scene {
             onComplete: () => this.cameras.main.fadeOut(1000)
         });
 
+        this.resetProgressTimer();
+
         this.time.delayedCall(2000, () => {
             this.soundtrack.stop();
+            this.bubblesSfx.stop();
             this.scene.start('start');
         }, [], this);
+    }
+
+    resetProgressTimer() {
+        if (this.progressTimer) {
+            this.progressTimer.remove(false);
+        }
     }
 
     updateScore(score) {
@@ -198,6 +261,19 @@ export class MainScene extends Phaser.Scene {
     }
     updateLives(lives) {
         this.lives = lives;
-        this.livesLeft.setText(`Lives Left: ${this.lives}`);
+
+        // Clean out all hearts
+        this.liveHearts.forEach(heart => {
+            if (heart) {
+                heart.destroy();
+            }
+        });
+        this.liveHearts = [];
+
+        for (let i = 1; i <= lives; i++) {
+            this.liveHearts[i] = this.add.sprite(+this.sys.game.config.width - ((this.heartOptions.size + this.heartOptions.padding) * i), this.heartOptions.padding, 'heart');
+            this.liveHearts[i].setDisplaySize(this.heartOptions.size, this.heartOptions.size);
+            this.liveHearts[i].setOrigin(0, 0);
+        }
     }
 }

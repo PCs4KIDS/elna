@@ -6,6 +6,7 @@ import { OPERATIONS } from '../operations';
 export class StartScene extends Phaser.Scene {
     bg;
     soundtrack;
+    buttonFx;
     gameTitle;
     playButton;
 
@@ -25,13 +26,14 @@ export class StartScene extends Phaser.Scene {
     preload() {}
 
     create() {
-        this.bg = this.add.tileSprite(0, 0, +this.sys.game.config.width, +this.sys.game.config.height, 'bg');
+        this.bg = this.add.sprite(0, 0, 'bg');
         this.bg.setOrigin(0, 0);
+        this.bg.setDisplaySize(+this.sys.game.config.width, +this.sys.game.config.height);
 
         this.soundtrack = this.sound.add('puzzle', {
-            loop: true,
-            volume: .1
+            loop: true
         });
+        this.buttonFx = this.sound.add('button_click_enter', {});
 
         this.soundtrack.play();
 
@@ -82,6 +84,7 @@ export class StartScene extends Phaser.Scene {
 
     initEvents() {
         this.playButton.on('pointerdown', () => {
+            this.buttonFx.play();
             this.startMode();
         });
     }

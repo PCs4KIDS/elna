@@ -18,6 +18,8 @@ export default class {
     bubble: Phaser.GameObjects.Sprite;
     bubbleText: Phaser.GameObjects.BitmapText;
 
+    popSfx: Phaser.Sound.BaseSound;
+
     operator = OPERATIONS.ADD;
 
     x;
@@ -30,6 +32,8 @@ export default class {
         this.opts = { ...this.defaults, ...opts };
 
         this.scene = scene;
+
+        this.popSfx = scene.sound.add('pop_sfx');
 
         // width, height, radius
         this.bubbleShape = new Phaser.Geom.Circle(0, 0, this.opts.bubbleSize / 2);
@@ -44,13 +48,23 @@ export default class {
         this.bubble.setDisplaySize(this.opts.bubbleSize, this.opts.bubbleSize);
         this.bubble.setOrigin(0.5);
 
+        // Animate the bubble
+        this.scene.tweens.add({
+            targets: this.container,
+            y: `-=${Phaser.Math.Between(30, 50)}`,
+            duration: Phaser.Math.Between(1000, 3500),
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: 2
+        });
+
         if (this.opts.mode) {
             this.operator = this.opts.mode;
         } else {
             // Choose an operator based on the level
             this.operator = Math.round(Phaser.Math.Between(1, Math.max(this.opts.level * .1, 1)));
             // The operator shouldn't be more than INFINITE
-            if (this.operator > OPERATIONS.INFINITE) {
+            if (this.operator >= OPERATIONS.INFINITE) {
                 this.operator = this.operator % OPERATIONS.INFINITE;
             }
         }
@@ -124,20 +138,21 @@ export default class {
             // console.log('Clicked bubble');
         });
         this.container.on('pointerup', () => {
-            this.opts.onClick(this.opts.value);
+            this.popSfx.play();
             this.scene.tweens.add({
                 targets: this.container,
                 scaleX: {
-                    value: 1,
+                    value: 0,
                     duration: 100,
                     ease: 'Quad.easeInOut'
                 },
                 scaleY: {
-                    value: 1,
+                    value: 0,
                     duration: 100,
                     ease: 'Quad.easeInOut'
                 },
             });
+            this.opts.onClick(this.opts.value);
         });
         this.container.on('pointerout', () => {
             // this.container.setScale(1);

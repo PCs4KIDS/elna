@@ -13,6 +13,8 @@ export class Button {
     button: Phaser.GameObjects.Sprite;
     text: Phaser.GameObjects.Text;
 
+    fx: Phaser.Sound.BaseSound;
+
     constructor(opts, scene: Phaser.Scene) {
         this.scene = scene;
 
@@ -26,6 +28,8 @@ export class Button {
         this.text = this.scene.add.text(0, 0, this.opts.text.toUpperCase(), { fontSize: 30, fontFamily: 'Arial', color: '#fff' });
         this.text.setOrigin(.5);
 
+        this.fx = this.scene.sound.add('button_click_enter', {});
+
         this.button.setDisplaySize(this.text.width + 60, this.button.displayHeight);
 
         this.container.add([this.button, this.text]);
@@ -38,6 +42,7 @@ export class Button {
         this.button.on('pointerdown', () => console.log('down:button'));
         this.button.on('pointerup', () => {
             console.log('up');
+            this.fx.play();
             this.opts.onClick(this);
         });
     }
