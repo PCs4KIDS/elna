@@ -84,9 +84,11 @@ export class MainScene extends Phaser.Scene {
     }
 
     update() {
-        // console.log(this.progressTimer.getProgress());
-        const maxProgressWidth = +this.sys.game.config.width - (this.progressBarOptions.outerPadding * 2);
-        this.progressBar.displayWidth = maxProgressWidth * this.progressTimer.getProgress();
+        // console.log(this.progressTimer.elapsed);
+        if (this.progressTimer.getProgress() !== 1) {
+            const maxProgressWidth = +this.sys.game.config.width - (this.progressBarOptions.outerPadding * 2);
+            this.progressBar.displayWidth = maxProgressWidth * this.progressTimer.getProgress();
+        }
         // if (this.key_A.isDown) {
         //     console.log('A is down.');
         // }
