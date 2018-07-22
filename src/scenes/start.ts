@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Bubble from '../objects/bubble';
 import { Button } from '../objects/button';
 import { OPERATIONS } from '../operations';
+import { config } from '../config';
 
 export class StartScene extends Phaser.Scene {
     bg;
@@ -31,9 +32,10 @@ export class StartScene extends Phaser.Scene {
         this.bg.setDisplaySize(+this.sys.game.config.width, +this.sys.game.config.height);
 
         this.soundtrack = this.sound.add('puzzle', {
-            loop: true
+            loop: true,
+            volume: config.volume
         });
-        this.buttonFx = this.sound.add('button_click_enter', {});
+        this.buttonFx = this.sound.add('button_click_enter', { volume: config.volume });
 
         this.soundtrack.play();
 

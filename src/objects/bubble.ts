@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { OPERATIONS } from '../operations';
+import { config } from '../config';
 
 
 export default class {
@@ -33,7 +34,7 @@ export default class {
 
         this.scene = scene;
 
-        this.popSfx = scene.sound.add('pop_sfx');
+        this.popSfx = scene.sound.add('pop_sfx', { volume: config.volume });
 
         // width, height, radius
         this.bubbleShape = new Phaser.Geom.Circle(0, 0, this.opts.bubbleSize / 2);

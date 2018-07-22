@@ -3,7 +3,7 @@ import { MainScene } from './scenes/main';
 import { PreloadScene } from './scenes/preload';
 import { StartScene } from './scenes/start';
 
-export const config = {
+export const phaserConfig = {
     type: Phaser.AUTO, // Let phaser determine how to render the game
     width: window.innerWidth,
     height: window.innerHeight,
@@ -18,4 +18,8 @@ export const config = {
         }
     },
     scene: [ PreloadScene, StartScene, MainScene ]
+};
+
+export const config = {
+    volume: .1
 };

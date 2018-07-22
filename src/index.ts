@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { config } from './config';
+import { phaserConfig } from './config';
 
-let game = new Phaser.Game(config);
+let game = new Phaser.Game(phaserConfig);
 
 window.onresize = function () {
     game.renderer.resize(window.innerWidth, window.innerHeight);

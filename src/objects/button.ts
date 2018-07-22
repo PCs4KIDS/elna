@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { config } from '../config';
 
 export class Button {
     defaults = {
@@ -28,7 +29,7 @@ export class Button {
         this.text = this.scene.add.text(0, 0, this.opts.text.toUpperCase(), { fontSize: 30, fontFamily: 'Arial', color: '#fff' });
         this.text.setOrigin(.5);
 
-        this.fx = this.scene.sound.add('button_click_enter', {});
+        this.fx = this.scene.sound.add('button_click_enter', { volume: config.volume });
 
         this.button.setDisplaySize(this.text.width + 60, this.button.displayHeight);
 

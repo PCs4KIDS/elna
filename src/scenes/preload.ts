@@ -6,6 +6,8 @@ export class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
+        this.showProgress();
+
         // this.load.image('bg', 'assets/bg.jpg');
         this.load.image('bg', 'assets/bg2.jpg');
         this.load.bitmapFont('yellowFont', 'assets/fonts/yellowfont/yellowfont.png', 'assets/fonts/yellowfont/yellowfont.fnt');
@@ -27,5 +29,31 @@ export class PreloadScene extends Phaser.Scene {
 
     create() {
         this.scene.start('start');
+    }
+
+    showProgress() {
+        const PROGRESS_BOX_HEIGHT = 50;
+        const PROGRESS_BOX_PADDING = 50;
+        const progressBar = this.add.graphics();
+        const progressBox = this.add.graphics();
+        // progressBox.fillStyle(0x222222, 0.8);
+        // progressBox.fillRect(PROGRESS_BOX_PADDING, (+this.sys.game.config.height - PROGRESS_BOX_HEIGHT) / 2, +this.sys.game.config.width - (PROGRESS_BOX_PADDING * 2), PROGRESS_BOX_HEIGHT);
+
+        this.load.on('progress', (value) => {
+            console.log(value);
+            progressBar.clear();
+            progressBar.fillStyle(0xffffff, 1);
+            progressBar.fillRect(PROGRESS_BOX_PADDING, (+this.sys.game.config.height - PROGRESS_BOX_HEIGHT) / 2, (+this.sys.game.config.width - (PROGRESS_BOX_PADDING * 2)) * value, PROGRESS_BOX_HEIGHT);
+        });
+                    
+        this.load.on('fileprogress', (file) => {
+            // console.log(file.src);
+        });
+        
+        this.load.on('complete', () => {
+            console.log('complete');
+            progressBar.destroy();
+            progressBox.destroy();
+        });
     }
 }

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Bubble from '../objects/bubble';
 import { OPERATIONS } from '../operations';
+import { config } from '../config';
 
 export class MainScene extends Phaser.Scene {
     initialState = {
@@ -53,10 +54,10 @@ export class MainScene extends Phaser.Scene {
         this.bg.setOrigin(0, 0);
         this.bg.setDisplaySize(+this.sys.game.config.width, +this.sys.game.config.height);
 
-        this.soundtrack = this.sound.add('bg_music', { loop: true });
-        this.bubblesSfx = this.sound.add('bubbles_rising_sfx', { loop: true, volume: .5 });
-        this.wrongSfx = this.sound.add('wrong_sfx', {});
-        this.correctSfx = this.sound.add('correct_sfx', {});
+        this.soundtrack = this.sound.add('bg_music', { loop: true, volume: config.volume });
+        this.bubblesSfx = this.sound.add('bubbles_rising_sfx', { loop: true, volume: config.volume / 2 });
+        this.wrongSfx = this.sound.add('wrong_sfx', { volume: config.volume });
+        this.correctSfx = this.sound.add('correct_sfx', { volume: config.volume });
 
         this.soundtrack.play();
         this.bubblesSfx.play();
@@ -173,6 +174,8 @@ export class MainScene extends Phaser.Scene {
             this.updateLives(this.lives - 1);
             this.showLoss();
         }
+
+        this.resetProgressTimer();
 
         if (this.lives > 0) {
             this.time.delayedCall(500, () => {
