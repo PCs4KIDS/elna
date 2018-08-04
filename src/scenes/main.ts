@@ -110,7 +110,7 @@ export class MainScene extends Phaser.Scene {
         });
 
         // Calculate the number of bubbles
-        const bubbleCount = Math.floor(this.bubbleCount + (this.level * 0.1));
+        const bubbleCount = Math.floor(this.bubbleCount + (this.level * 0.2));
 
         this.bubbles = [];
 
