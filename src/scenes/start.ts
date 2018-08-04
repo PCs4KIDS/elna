@@ -40,7 +40,7 @@ export class StartScene extends Phaser.Scene {
         this.soundtrack.play();
 
         const gameSizeZone = this.add.zone(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, +this.sys.game.config.width, +this.sys.game.config.height);
-        this.gameTitle = this.add.bitmapText(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, 'yellowFont', 'ENLAs', 100);
+        this.gameTitle = this.add.bitmapText(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, 'yellowFont', 'ENLAss', 100);
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
         Phaser.Display.Align.In.Center(this.gameTitle, gameSizeZone);
 
