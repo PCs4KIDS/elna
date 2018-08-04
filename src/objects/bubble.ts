@@ -56,7 +56,7 @@ export default class {
             duration: Phaser.Math.Between(1000, 3500),
             ease: 'Sine.easeInOut',
             yoyo: true,
-            repeat: 2
+            repeat: -1
         });
 
         if (this.opts.mode) {
