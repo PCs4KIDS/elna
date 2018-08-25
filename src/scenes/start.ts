@@ -3,6 +3,7 @@ import Bubble from '../objects/bubble';
 import { Button } from '../objects/button';
 import { OPERATIONS } from '../operations';
 import { config } from '../config';
+import { Store } from '../store';
 
 export class StartScene extends Phaser.Scene {
     bg;
@@ -18,10 +19,11 @@ export class StartScene extends Phaser.Scene {
 
     modeButtonsContainer;
 
-    constructor() {
+    constructor(private store: Store) {
         super({
             key: 'start'
         });
+        this.store = new Store();
     }
 
     preload() {}
@@ -43,6 +45,9 @@ export class StartScene extends Phaser.Scene {
         this.gameTitle = this.add.bitmapText(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, 'yellowFont', 'ENLA', 100);
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
         Phaser.Display.Align.In.Center(this.gameTitle, gameSizeZone);
+
+        this.add.text(10, 10, `Highscore: ${this.store.get('highscore') || 0}`);
+        this.add.text(10, 30, `Your Score: ${this.store.get('yourscore') || 0}`);
 
         // Then move the title upwards
         this.gameTitle.y = this.gameTitle.y - 150;

@@ -12,11 +12,15 @@ export class PreloadScene extends Phaser.Scene {
         this.load.image('bg', 'assets/bg2.jpg');
         this.load.bitmapFont('yellowFont', 'assets/fonts/yellowfont/yellowfont.png', 'assets/fonts/yellowfont/yellowfont.fnt');
         this.load.image('bubble', 'assets/bubble.png');
-        this.load.image('play_button', 'assets/play_button.png');
-        this.load.image('button', 'assets/button.png');
+        this.load.image('play_button', 'assets/ui/play_button.png');
+        this.load.image('pause_button', 'assets/ui/pause_button.png');
+        this.load.image('button', 'assets/ui/button.png');
         this.load.image('progress_bar', 'assets/progress_bar.png');
         this.load.image('progress_tile', 'assets/progress_tile.png');
+        this.load.image('panel', 'assets/ui/kenney/images/grey_panel.png');
         this.load.image('heart', 'assets/heart.png');
+        this.load.image('mute', 'assets/ui/mute.png');
+        this.load.image('unmute', 'assets/ui/unmute.png');
 
         this.load.audio('puzzle', 'assets/sounds/puzzle.mp3');
         this.load.audio('bg_music', 'assets/sounds/bg.mp3');

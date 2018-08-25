@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import Bubble from '../objects/bubble';
 import { OPERATIONS } from '../operations';
 import { config } from '../config';
+import { Button } from '../objects/button';
+import { Store } from '../store';
 
 export class MainScene extends Phaser.Scene {
     initialState = {
@@ -38,37 +40,44 @@ export class MainScene extends Phaser.Scene {
     correctSfx;
     scoreCard;
     progressBar;
+    pauseButton;
+    pausePanel;
 
     progressTimer;
 
-    constructor() {
+    constructor(private store: Store) {
         super({ key: 'main' });
+        this.store = new Store();
     }
-
+    
     preload() {}
-
+    
     create(data) {
         this.mode = data.mode;
-
+        
         this.bg = this.add.sprite(0, 0, 'bg');
         this.bg.setOrigin(0, 0);
         this.bg.setDisplaySize(+this.sys.game.config.width, +this.sys.game.config.height);
-
+        
         this.soundtrack = this.sound.add('bg_music', { loop: true, volume: config.volume });
         this.bubblesSfx = this.sound.add('bubbles_rising_sfx', { loop: true, volume: config.volume / 2 });
         this.wrongSfx = this.sound.add('wrong_sfx', { volume: config.volume });
         this.correctSfx = this.sound.add('correct_sfx', { volume: config.volume });
-
+        
         this.soundtrack.play();
         this.bubblesSfx.play();
-
+        
         this.scoreCard = this.add.bitmapText(10, 10, 'yellowFont', `Score: ${this.score}`, 40);
         this.add.text(10, 60, 'Tip: Bigger = Better.');
-
+        
         // this.progressBar = this.add.sprite(this.progressBarOptions.outerPadding, +this.sys.game.config.height - this.progressBarOptions.height - this.progressBarOptions.outerPadding, 'progress_bar');
         this.progressBar = this.add.tileSprite(this.progressBarOptions.outerPadding, +this.sys.game.config.height - this.progressBarOptions.height - this.progressBarOptions.outerPadding, 128, 128, 'progress_tile');
         this.progressBar.setOrigin(0);
         this.progressBar.setDisplaySize(0, this.progressBarOptions.height);
+        
+        this.pauseButton = this.add.sprite(+this.sys.game.config.width - 85, 15, 'pause_button').setInteractive();
+        this.pauseButton.setDisplaySize(75, 75);
+        this.pauseButton.setOrigin(0, 0);
 
         // this.txtStartGame = this.add.bitmapText(this.sys.game.config.width / 2, this.sys.game.config.height / 2, 'yellowFont', 'Enla', 60);
         // Center the text, to a zone whose center is positioned at the center of the game, and it's dimension is the same as the game
@@ -81,6 +90,13 @@ export class MainScene extends Phaser.Scene {
         this.updateLives(this.lives);
 
         this.startLevel();
+        this.initEvents();
+    }
+
+    initEvents() {
+        this.pauseButton.on('pointerdown', () => {
+            this.showPausePanel();
+        });
     }
 
     update() {
@@ -229,7 +245,18 @@ export class MainScene extends Phaser.Scene {
         this.cameras.main.shake(300);
     }
 
+    showPausePanel() {
+        // this.scene.pause('main');
+        this.scene.launch('pause', { mainScene: this });
+    }
+
     gameOver() {
+        this.store.set('yourscore', this.score);
+        const curHighscore: number = Number(this.store.get('highscore')) || 0;
+        if (this.score > curHighscore) {
+            this.store.set('highscore', this.score);
+        }
+
         const gameOverText = this.add.bitmapText(+this.sys.game.config.width / 2, +this.sys.game.config.height / 2, 'yellowFont', 'GAME OVER.', 70);
         gameOverText.setOrigin(0.5);
         gameOverText.setScale(0);
@@ -248,10 +275,14 @@ export class MainScene extends Phaser.Scene {
         this.resetProgressTimer();
 
         this.time.delayedCall(2000, () => {
-            this.soundtrack.stop();
-            this.bubblesSfx.stop();
-            this.scene.start('start');
+            this.backToStartScene();
         }, [], this);
+    }
+
+    backToStartScene() {
+        this.soundtrack.stop();
+        this.bubblesSfx.stop();
+        this.scene.start('start');
     }
 
     resetProgressTimer() {
@@ -275,8 +306,8 @@ export class MainScene extends Phaser.Scene {
         });
         this.liveHearts = [];
 
-        for (let i = 1; i <= lives; i++) {
-            this.liveHearts[i] = this.add.sprite(+this.sys.game.config.width - ((this.heartOptions.size + this.heartOptions.padding) * i), this.heartOptions.padding, 'heart');
+        for (let i = 0; i < lives; i++) {
+            this.liveHearts[i] = this.add.sprite(((this.heartOptions.size * i) + (this.heartOptions.padding * (i+1))), this.heartOptions.padding + 80, 'heart');
             this.liveHearts[i].setDisplaySize(this.heartOptions.size, this.heartOptions.size);
             this.liveHearts[i].setOrigin(0, 0);
         }
